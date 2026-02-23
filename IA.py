@@ -34,13 +34,13 @@ tools=[
         {
             "type": "function",
             "function": {
-                "name": "",
-                "description": "",
+                "name": "list_files_in_dir",
+                "description": "lista los archivos que existen en un Directorio dado (por defecto en el directorio actual).",
                 "parameters": {
                     "type": "object",
                     "properties": {
-                        "param1": {"type": "string", "description": "..."}
-                    },
+                        "param1": {"type": "string", "description": " Directorio para listar(opcional). por defecto en el directorio actual."}
+                    }, 
                     "required": ["param1"]
                 }
             }
@@ -67,11 +67,17 @@ while True:
 
   response = client.chat.completions.create(
      model="llama-3.3-70b-versatile",
-     messages=messages 
+     messages=messages,
+     tools=tools
 )
   
 
-  replicar_message = response.choices[0].message.content
-  messages.append({"role": "assistant", "content": replicar_message })
+#   replicar_message = response.choices[0].message.content
+#   messages.append({"role": "assistant", "content": replicar_message })
 
-  print(f"Asistente : {replicar_message}")
+#   print(f"Asistente : {replicar_message}")
+
+# almacenar para el historial
+
+
+
