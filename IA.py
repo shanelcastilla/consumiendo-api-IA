@@ -1,6 +1,7 @@
 from groq import Groq
 from dotenv import load_dotenv
 import os
+import json
 
 # lee archivo env
 load_dotenv()
@@ -15,11 +16,11 @@ client = Groq()
 
 # creamos una lista donde se almacenara las comversaciones
 messages = [
-   {"role":"system", "content": "eres un asistente util"}
+   { "role":"system", "content": "eres un asistente util" }
 ]
 
 
-# funcion
+# funcion asignada 
 
 def list_files_in_dir(directory ="."):
   print("⚙️ Herramienta llamado: list_files_in_dir")
@@ -39,9 +40,9 @@ tools=[
                 "parameters": {
                     "type": "object",
                     "properties": {
-                        "param1": {"type": "string", "description": " Directorio para listar(opcional). por defecto en el directorio actual."}
+                        "directory": {"type": "string", "description": "Directorio para listar (opcional). Por defecto es el directorio actual."}
                     }, 
-                    "required": ["param1"]
+                    "required": []
                 }
             }
         }
@@ -69,15 +70,31 @@ while True:
      model="llama-3.3-70b-versatile",
      messages=messages,
      tools=tools
-)
+  )
   
+  # obtener la respuesta del modelo
+  assistant_message = response.choices[0].message
+  
+  # agregar mensaje del asistente al historial
+  messages.append({"role": "assistant", "content": assistant_message.content or ""})
+  
+  # holverificar si hay tool calls
+  if assistant_message.tool_calls:
+      for tool_call in assistant_message.tool_calls:
+          ft_name = tool_call.function.name
+          args = json.loads(tool_call.function.arguments)
+          
+          print(f"el modelo considera llamar a la herramienta {ft_name}")
+          
+          # ejecutar la herramienta
+          if ft_name == "list_files_in_dir":
+              result = list_files_in_dir(args.get("directory", "."))
+              print(f"Resultado: {result}")
+  else:
+      # si no hay tool calls, solo mostrar el mensaje
+      if assistant_message.content:
+          print(f"ASISTENTE : {assistant_message.content}")
 
-#   replicar_message = response.choices[0].message.content
-#   messages.append({"role": "assistant", "content": replicar_message })
-
-#   print(f"Asistente : {replicar_message}")
-
-# almacenar para el historial
 
 
 
